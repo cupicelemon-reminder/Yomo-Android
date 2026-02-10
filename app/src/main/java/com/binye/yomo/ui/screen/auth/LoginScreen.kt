@@ -35,6 +35,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.binye.yomo.R
 import com.binye.yomo.data.repository.AuthRepository
 import com.binye.yomo.ui.component.AuthButton
+import com.binye.yomo.ui.component.GoogleLogo
 import com.binye.yomo.ui.component.GradientBackground
 import com.binye.yomo.ui.theme.Spacing
 import com.binye.yomo.ui.theme.YomoColors
@@ -106,7 +107,8 @@ fun LoginScreen(
                     }
                 },
                 enabled = !isLoading,
-                isLoading = isLoading
+                isLoading = isLoading,
+                iconContent = { GoogleLogo() }
             )
 
             Spacer(modifier = Modifier.height(Spacing.md))

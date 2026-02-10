@@ -7,7 +7,7 @@ object YomoColors {
     val BrandBlueDark = Color(0xFF3A7BC8)
     val BrandBlueBg = Color(0xFFEBF3FC)
     val CheckGold = Color(0xFFF5A623)
-    val CardGlass = Color(0xB8FFFFFF) // 72% white
+    val CardGlass = Color(0xFFFFFFFF) // opaque white
     val CardGlassBorder = Color(0x0D000000) // subtle dark border
     val TextPrimary = Color(0xFF1A1A2E)
     val TextSecondary = Color(0xFF8E8E93)
