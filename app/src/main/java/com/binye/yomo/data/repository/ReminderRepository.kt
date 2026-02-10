@@ -40,16 +40,16 @@ class ReminderRepository @Inject constructor(
         }
 
         val listener: ListenerRegistration = ref
-            .whereEqualTo("status", ReminderStatus.ACTIVE.value)
             .orderBy("triggerDate")
             .addSnapshotListener { snapshot, error ->
                 if (error != null) {
                     trySend(emptyList())
                     return@addSnapshotListener
                 }
-                val reminders = snapshot?.documents?.mapNotNull { doc ->
-                    decodeReminder(doc.id, doc.data)
-                } ?: emptyList()
+                val reminders = (snapshot?.documents ?: emptyList())
+                    .mapNotNull { doc -> decodeReminder(doc.id, doc.data) }
+                    // Avoid requiring a composite index (status + triggerDate) in MVP.
+                    .filter { it.status == ReminderStatus.ACTIVE }
                 trySend(reminders)
             }
 

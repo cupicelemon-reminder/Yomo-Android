@@ -29,6 +29,7 @@ class HomeViewModel @Inject constructor(
 ) : ViewModel() {
 
     val groupedReminders: StateFlow<GroupedReminders> = reminderRepository.observeReminders()
+        .map { reminders -> reminders.sortedBy { it.displayDate } }
         .map { reminders -> groupReminders(reminders) }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), GroupedReminders())
 
