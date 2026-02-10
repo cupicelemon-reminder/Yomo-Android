@@ -2,5 +2,5 @@
 <resources>
     <string name="app_name">Yomo</string>
     <!-- Credential Manager Google Sign-In requires the OAuth 2.0 Web client ID. -->
-    <string name="default_web_client_id">703462753424-062ba4e6aim03jd94b11ktuquf0sf6pu.apps.googleusercontent.com</string>
+    <string name="default_web_client_id">240921047280-e083q44bb944p99loqpi48tmkcdqg0b3.apps.googleusercontent.com</string>
 </resources>
