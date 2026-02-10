@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -35,14 +34,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.binye.yomo.ui.component.GlassCard
+import com.binye.yomo.ui.theme.Spacing
 import com.binye.yomo.ui.theme.YomoColors
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -58,13 +55,7 @@ fun SettingsScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(
-                Brush.linearGradient(
-                    colors = listOf(YomoColors.BackgroundStart, YomoColors.BackgroundEnd),
-                    start = Offset(0f, 0f),
-                    end = Offset(0f, Float.POSITIVE_INFINITY)
-                )
-            )
+            .background(YomoColors.Background)
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
             TopAppBar(
@@ -79,7 +70,7 @@ fun SettingsScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.Transparent,
+                    containerColor = YomoColors.Background,
                     titleContentColor = YomoColors.TextPrimary
                 )
             )
@@ -88,15 +79,14 @@ fun SettingsScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState())
-                    .padding(horizontal = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                    .padding(horizontal = Spacing.md),
+                verticalArrangement = Arrangement.spacedBy(Spacing.md)
             ) {
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(Spacing.sm))
 
-                // Account section
                 SectionTitle("Account")
                 GlassCard(modifier = Modifier.fillMaxWidth()) {
-                    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                    Column {
                         SettingsRow(
                             icon = Icons.Default.Person,
                             label = "Signed in as",
@@ -108,10 +98,9 @@ fun SettingsScreen(
                     }
                 }
 
-                // Appearance section
                 SectionTitle("Appearance")
                 GlassCard(modifier = Modifier.fillMaxWidth()) {
-                    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                    Column {
                         SettingsRow(
                             icon = Icons.Default.DarkMode,
                             label = "Theme",
@@ -120,10 +109,9 @@ fun SettingsScreen(
                     }
                 }
 
-                // About section
                 SectionTitle("About")
                 GlassCard(modifier = Modifier.fillMaxWidth()) {
-                    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                    Column {
                         SettingsRow(
                             icon = Icons.Default.Info,
                             label = "Version",
@@ -132,7 +120,6 @@ fun SettingsScreen(
                     }
                 }
 
-                // Sign out
                 GlassCard(modifier = Modifier.fillMaxWidth()) {
                     TextButton(
                         onClick = { showSignOutDialog = true },
@@ -143,7 +130,7 @@ fun SettingsScreen(
                             contentDescription = null,
                             tint = YomoColors.OverdueRed
                         )
-                        Spacer(modifier = Modifier.padding(horizontal = 4.dp))
+                        Spacer(modifier = Modifier.padding(horizontal = Spacing.xs))
                         Text(
                             "Sign Out",
                             color = YomoColors.OverdueRed,
@@ -152,7 +139,7 @@ fun SettingsScreen(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(Spacing.xl))
             }
         }
     }
@@ -188,9 +175,9 @@ private fun SectionTitle(title: String) {
     Text(
         text = title,
         style = MaterialTheme.typography.labelLarge,
-        color = YomoColors.TextMuted,
+        color = YomoColors.TextTertiary,
         fontWeight = FontWeight.Bold,
-        modifier = Modifier.padding(start = 4.dp)
+        modifier = Modifier.padding(start = Spacing.xs)
     )
 }
 
@@ -215,7 +202,7 @@ private fun SettingsRow(icon: ImageVector, label: String, value: String) {
             Text(
                 text = value,
                 style = MaterialTheme.typography.bodyMedium,
-                color = YomoColors.TextMuted
+                color = YomoColors.TextTertiary
             )
         }
     }

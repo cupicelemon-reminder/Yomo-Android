@@ -9,23 +9,28 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.binye.yomo.ui.theme.CornerRadius
+import com.binye.yomo.ui.theme.Elevation
+import com.binye.yomo.ui.theme.Spacing
 import com.binye.yomo.ui.theme.YomoColors
 
 @Composable
 fun GlassCard(
     modifier: Modifier = Modifier,
-    cornerRadius: Dp = 20.dp,
+    cornerRadius: Dp = CornerRadius.xl,
     content: @Composable BoxScope.() -> Unit
 ) {
     val shape = RoundedCornerShape(cornerRadius)
     Box(
         modifier = modifier
+            .shadow(Elevation.card, shape)
             .clip(shape)
             .background(YomoColors.CardGlass)
-            .border(1.dp, YomoColors.CardGlassBorder, shape)
-            .padding(16.dp),
+            .border(0.5.dp, YomoColors.CardGlassBorder, shape)
+            .padding(Spacing.md),
         content = content
     )
 }

@@ -4,6 +4,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.slideInVertically
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -11,15 +12,16 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -38,17 +40,19 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.binye.yomo.R
 import com.binye.yomo.data.model.Reminder
+import com.binye.yomo.ui.component.PillButton
 import com.binye.yomo.ui.component.ReminderCard
+import com.binye.yomo.ui.theme.Spacing
 import com.binye.yomo.ui.theme.YomoColors
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -63,14 +67,14 @@ fun HomeScreen(
     val isEmpty by viewModel.isEmpty.collectAsStateWithLifecycle()
 
     Scaffold(
-        containerColor = Color.Transparent,
+        containerColor = YomoColors.Background,
         topBar = {
             TopAppBar(
                 title = {
-                    Text(
-                        "Yomo",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 24.sp
+                    Image(
+                        painter = painterResource(id = R.drawable.yomo_logo),
+                        contentDescription = "Yomo",
+                        modifier = Modifier.size(36.dp)
                     )
                 },
                 actions = {
@@ -78,12 +82,12 @@ fun HomeScreen(
                         Icon(
                             Icons.Default.Settings,
                             contentDescription = "Settings",
-                            tint = YomoColors.TextPrimary
+                            tint = YomoColors.TextSecondary
                         )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.Transparent,
+                    containerColor = YomoColors.Background,
                     titleContentColor = YomoColors.TextPrimary
                 )
             )
@@ -92,7 +96,7 @@ fun HomeScreen(
             FloatingActionButton(
                 onClick = onCreateReminder,
                 containerColor = YomoColors.BrandBlue,
-                contentColor = YomoColors.TextPrimary,
+                contentColor = Color.White,
                 shape = CircleShape
             ) {
                 Icon(
@@ -106,21 +110,15 @@ fun HomeScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(
-                    Brush.linearGradient(
-                        colors = listOf(YomoColors.BackgroundStart, YomoColors.BackgroundEnd),
-                        start = Offset(0f, 0f),
-                        end = Offset(0f, Float.POSITIVE_INFINITY)
-                    )
-                )
+                .background(YomoColors.Background)
                 .padding(padding)
         ) {
             if (isEmpty) {
-                EmptyState()
+                EmptyState(onCreateReminder = onCreateReminder)
             } else {
                 LazyColumn(
-                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                    contentPadding = PaddingValues(horizontal = Spacing.md, vertical = Spacing.sm),
+                    verticalArrangement = Arrangement.spacedBy(Spacing.sm)
                 ) {
                     if (grouped.overdue.isNotEmpty()) {
                         item {
@@ -130,7 +128,7 @@ fun HomeScreen(
                             grouped.overdue,
                             key = { _, r -> r.id }
                         ) { index, reminder ->
-                            SwipeToDeleteReminder(
+                            SwipeableReminder(
                                 reminder = reminder,
                                 onDelete = { viewModel.deleteReminder(reminder.id) },
                                 onClick = { onEditReminder(reminder.id) },
@@ -148,7 +146,7 @@ fun HomeScreen(
                             grouped.today,
                             key = { _, r -> r.id }
                         ) { index, reminder ->
-                            SwipeToDeleteReminder(
+                            SwipeableReminder(
                                 reminder = reminder,
                                 onDelete = { viewModel.deleteReminder(reminder.id) },
                                 onClick = { onEditReminder(reminder.id) },
@@ -166,7 +164,7 @@ fun HomeScreen(
                             grouped.tomorrow,
                             key = { _, r -> r.id }
                         ) { index, reminder ->
-                            SwipeToDeleteReminder(
+                            SwipeableReminder(
                                 reminder = reminder,
                                 onDelete = { viewModel.deleteReminder(reminder.id) },
                                 onClick = { onEditReminder(reminder.id) },
@@ -178,13 +176,13 @@ fun HomeScreen(
 
                     if (grouped.upcoming.isNotEmpty()) {
                         item {
-                            SectionHeader("UPCOMING", YomoColors.TextMuted)
+                            SectionHeader("UPCOMING", YomoColors.TextTertiary)
                         }
                         itemsIndexed(
                             grouped.upcoming,
                             key = { _, r -> r.id }
                         ) { index, reminder ->
-                            SwipeToDeleteReminder(
+                            SwipeableReminder(
                                 reminder = reminder,
                                 onDelete = { viewModel.deleteReminder(reminder.id) },
                                 onClick = { onEditReminder(reminder.id) },
@@ -209,13 +207,13 @@ private fun SectionHeader(title: String, color: Color) {
         color = color,
         fontWeight = FontWeight.Bold,
         letterSpacing = 1.sp,
-        modifier = Modifier.padding(vertical = 8.dp, horizontal = 4.dp)
+        modifier = Modifier.padding(vertical = Spacing.sm, horizontal = Spacing.xs)
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun SwipeToDeleteReminder(
+private fun SwipeableReminder(
     reminder: Reminder,
     onDelete: () -> Unit,
     onClick: () -> Unit,
@@ -225,8 +223,10 @@ private fun SwipeToDeleteReminder(
     val dismissState = rememberSwipeToDismissBoxState()
 
     LaunchedEffect(dismissState.currentValue) {
-        if (dismissState.currentValue == SwipeToDismissBoxValue.EndToStart) {
-            onDelete()
+        when (dismissState.currentValue) {
+            SwipeToDismissBoxValue.EndToStart -> onDelete()
+            SwipeToDismissBoxValue.StartToEnd -> onComplete()
+            SwipeToDismissBoxValue.Settled -> {}
         }
     }
 
@@ -238,25 +238,44 @@ private fun SwipeToDeleteReminder(
         SwipeToDismissBox(
             state = dismissState,
             backgroundContent = {
+                val alignment = when (dismissState.dismissDirection) {
+                    SwipeToDismissBoxValue.StartToEnd -> Alignment.CenterStart
+                    SwipeToDismissBoxValue.EndToStart -> Alignment.CenterEnd
+                    else -> Alignment.Center
+                }
+                val backgroundColor = when (dismissState.dismissDirection) {
+                    SwipeToDismissBoxValue.StartToEnd -> YomoColors.SuccessGreen
+                    SwipeToDismissBoxValue.EndToStart -> YomoColors.OverdueRed
+                    else -> Color.Transparent
+                }
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(horizontal = 16.dp),
-                    contentAlignment = Alignment.CenterEnd
+                        .background(backgroundColor, RoundedCornerShape(16.dp))
+                        .padding(horizontal = Spacing.md),
+                    contentAlignment = alignment
                 ) {
-                    Text(
-                        text = "Delete",
-                        color = YomoColors.OverdueRed,
-                        fontWeight = FontWeight.Bold
-                    )
+                    when (dismissState.dismissDirection) {
+                        SwipeToDismissBoxValue.StartToEnd -> Icon(
+                            Icons.Default.Check,
+                            contentDescription = "Complete",
+                            tint = Color.White
+                        )
+                        SwipeToDismissBoxValue.EndToStart -> Text(
+                            text = "Delete",
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold
+                        )
+                        else -> {}
+                    }
                 }
             },
-            enableDismissFromStartToEnd = false,
+            enableDismissFromStartToEnd = true,
+            enableDismissFromEndToStart = true,
             content = {
                 ReminderCard(
                     reminder = reminder,
-                    onClick = onClick,
-                    onComplete = onComplete
+                    onClick = onClick
                 )
             }
         )
@@ -264,31 +283,31 @@ private fun SwipeToDeleteReminder(
 }
 
 @Composable
-private fun EmptyState() {
-    val messages = listOf(
-        "No reminders yet.\nTap + to create your first one!",
-        "Your schedule is clear!\nEnjoy the moment.",
-        "Nothing to remind you about.\nLet's add something!"
-    )
-    val message = messages.random()
-
+private fun EmptyState(onCreateReminder: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(32.dp),
+            .padding(Spacing.xl),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(
-            text = "🎯",
-            fontSize = 48.sp
+        Image(
+            painter = painterResource(id = R.drawable.yomo_logo),
+            contentDescription = "Yomo",
+            modifier = Modifier.size(80.dp)
         )
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(Spacing.md))
         Text(
-            text = message,
+            text = "All clear! Nothing to remind you about.",
             style = MaterialTheme.typography.bodyLarge,
             color = YomoColors.TextSecondary,
             textAlign = TextAlign.Center
+        )
+        Spacer(modifier = Modifier.height(Spacing.lg))
+        PillButton(
+            text = "Create a reminder",
+            selected = true,
+            onClick = onCreateReminder
         )
     }
 }

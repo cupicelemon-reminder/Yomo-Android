@@ -10,25 +10,16 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilterChip
-import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TimePicker
@@ -43,21 +34,21 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.binye.yomo.data.model.RecurrenceType
+import com.binye.yomo.ui.component.FormField
 import com.binye.yomo.ui.component.GlassCard
+import com.binye.yomo.ui.component.PillButton
+import com.binye.yomo.ui.component.PrimaryButton
+import com.binye.yomo.ui.theme.CornerRadius
+import com.binye.yomo.ui.theme.Spacing
 import com.binye.yomo.ui.theme.YomoColors
 import java.text.SimpleDateFormat
 import java.util.Calendar
-import java.util.Date
 import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -74,26 +65,10 @@ fun CreateReminderScreen(
     val dateFormat = SimpleDateFormat("EEE, MMM d, yyyy", Locale.getDefault())
     val timeFormat = SimpleDateFormat("h:mm a", Locale.getDefault())
 
-    val fieldColors = OutlinedTextFieldDefaults.colors(
-        focusedBorderColor = YomoColors.BrandBlue,
-        unfocusedBorderColor = YomoColors.CardGlassBorder,
-        focusedTextColor = YomoColors.TextPrimary,
-        unfocusedTextColor = YomoColors.TextPrimary,
-        cursorColor = YomoColors.BrandBlue,
-        focusedLabelColor = YomoColors.BrandBlue,
-        unfocusedLabelColor = YomoColors.TextMuted
-    )
-
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(
-                Brush.linearGradient(
-                    colors = listOf(YomoColors.BackgroundStart, YomoColors.BackgroundEnd),
-                    start = Offset(0f, 0f),
-                    end = Offset(0f, Float.POSITIVE_INFINITY)
-                )
-            )
+            .background(YomoColors.Background)
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
             TopAppBar(
@@ -108,7 +83,7 @@ fun CreateReminderScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.Transparent,
+                    containerColor = YomoColors.Background,
                     titleContentColor = YomoColors.TextPrimary
                 )
             )
@@ -117,55 +92,44 @@ fun CreateReminderScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState())
-                    .padding(horizontal = 16.dp)
+                    .padding(horizontal = Spacing.md)
             ) {
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(Spacing.sm))
 
-                // Title
-                OutlinedTextField(
+                FormField(
                     value = state.title,
                     onValueChange = viewModel::updateTitle,
-                    label = { Text("What do you need to remember?") },
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = fieldColors,
-                    singleLine = true
+                    label = "What do you need to remember?"
                 )
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(Spacing.md))
 
-                // Notes
-                OutlinedTextField(
+                FormField(
                     value = state.notes,
                     onValueChange = viewModel::updateNotes,
-                    label = { Text("Notes (optional)") },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(100.dp),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = fieldColors,
-                    maxLines = 4
+                    label = "Notes (optional)",
+                    singleLine = false,
+                    maxLines = 4,
+                    minHeight = 80
                 )
 
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(Spacing.lg))
 
-                // Date & Time
                 Text(
                     text = "When",
                     style = MaterialTheme.typography.labelLarge,
                     color = YomoColors.TextSecondary
                 )
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(Spacing.sm))
 
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(Spacing.sm),
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     GlassCard(
-                        modifier = Modifier
-                            .weight(1f),
-                        cornerRadius = 12.dp
+                        modifier = Modifier.weight(1f),
+                        cornerRadius = CornerRadius.medium
                     ) {
                         TextButton(
                             onClick = { showDatePicker = true },
@@ -179,9 +143,8 @@ fun CreateReminderScreen(
                     }
 
                     GlassCard(
-                        modifier = Modifier
-                            .weight(1f),
-                        cornerRadius = 12.dp
+                        modifier = Modifier.weight(1f),
+                        cornerRadius = CornerRadius.medium
                     ) {
                         TextButton(
                             onClick = { showTimePicker = true },
@@ -195,97 +158,65 @@ fun CreateReminderScreen(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(Spacing.lg))
 
-                // Recurrence
                 Text(
                     text = "Repeat",
                     style = MaterialTheme.typography.labelLarge,
                     color = YomoColors.TextSecondary
                 )
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(Spacing.sm))
 
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    horizontalArrangement = Arrangement.spacedBy(Spacing.sm)
                 ) {
                     RecurrenceType.entries
                         .filter { it != RecurrenceType.CUSTOM }
                         .forEach { type ->
-                            FilterChip(
-                                selected = state.recurrenceType == type,
-                                onClick = { viewModel.updateRecurrence(type) },
-                                label = {
-                                    Text(
-                                        when (type) {
-                                            RecurrenceType.NONE -> "None"
-                                            RecurrenceType.DAILY -> "Daily"
-                                            RecurrenceType.WEEKLY -> "Weekly"
-                                            RecurrenceType.CUSTOM -> "Custom"
-                                        }
-                                    )
+                            PillButton(
+                                text = when (type) {
+                                    RecurrenceType.NONE -> "None"
+                                    RecurrenceType.DAILY -> "Daily"
+                                    RecurrenceType.WEEKLY -> "Weekly"
+                                    RecurrenceType.CUSTOM -> "Custom"
                                 },
-                                colors = FilterChipDefaults.filterChipColors(
-                                    selectedContainerColor = YomoColors.BrandBlue,
-                                    selectedLabelColor = YomoColors.TextPrimary,
-                                    containerColor = YomoColors.CardGlass,
-                                    labelColor = YomoColors.TextSecondary
-                                )
+                                selected = state.recurrenceType == type,
+                                onClick = { viewModel.updateRecurrence(type) }
                             )
                         }
                 }
 
                 if (state.recurrenceType == RecurrenceType.WEEKLY) {
-                    Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.height(Spacing.sm))
                     WeekdaySelector(
                         selected = state.selectedWeekDays,
                         onToggle = viewModel::toggleWeekDay
                     )
                 }
 
-                Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(Spacing.xl))
 
-                // Error
                 state.error?.let { error ->
                     Text(
                         text = error,
                         color = YomoColors.OverdueRed,
                         style = MaterialTheme.typography.bodyMedium
                     )
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(Spacing.sm))
                 }
 
-                // Create button
-                Button(
+                PrimaryButton(
+                    text = "Create Reminder",
                     onClick = { viewModel.createReminder(onCreated) },
-                    enabled = !state.isLoading,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(56.dp),
-                    shape = RoundedCornerShape(16.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = YomoColors.BrandBlue)
-                ) {
-                    if (state.isLoading) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(24.dp),
-                            color = YomoColors.TextPrimary,
-                            strokeWidth = 2.dp
-                        )
-                    } else {
-                        Text(
-                            "Create Reminder",
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.SemiBold
-                        )
-                    }
-                }
+                    isLoading = state.isLoading
+                )
 
-                Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(Spacing.xl))
             }
         }
     }
 
-    // Date Picker Dialog
     if (showDatePicker) {
         val datePickerState = rememberDatePickerState(
             initialSelectedDateMillis = state.date.time
@@ -316,7 +247,6 @@ fun CreateReminderScreen(
         }
     }
 
-    // Time Picker Dialog
     if (showTimePicker) {
         val cal = Calendar.getInstance().apply { time = state.date }
         val timePickerState = rememberTimePickerState(
@@ -324,13 +254,13 @@ fun CreateReminderScreen(
             initialMinute = cal.get(Calendar.MINUTE)
         )
         Dialog(onDismissRequest = { showTimePicker = false }) {
-            GlassCard(cornerRadius = 24.dp) {
+            GlassCard(cornerRadius = CornerRadius.large) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.padding(16.dp)
+                    modifier = Modifier.padding(Spacing.md)
                 ) {
                     TimePicker(state = timePickerState)
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(Spacing.md))
                     Row(
                         horizontalArrangement = Arrangement.End,
                         modifier = Modifier.fillMaxWidth()
@@ -377,16 +307,10 @@ private fun WeekdaySelector(
         horizontalArrangement = Arrangement.spacedBy(6.dp)
     ) {
         days.forEach { (dayInt, label) ->
-            FilterChip(
+            PillButton(
+                text = label,
                 selected = selected.contains(dayInt),
-                onClick = { onToggle(dayInt) },
-                label = { Text(label) },
-                colors = FilterChipDefaults.filterChipColors(
-                    selectedContainerColor = YomoColors.BrandBlue,
-                    selectedLabelColor = YomoColors.TextPrimary,
-                    containerColor = YomoColors.CardGlass,
-                    labelColor = YomoColors.TextSecondary
-                )
+                onClick = { onToggle(dayInt) }
             )
         }
     }

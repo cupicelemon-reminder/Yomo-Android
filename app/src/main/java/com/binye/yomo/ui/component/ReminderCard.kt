@@ -15,20 +15,22 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Repeat
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.binye.yomo.data.model.Reminder
 import com.binye.yomo.data.model.RecurrenceType
+import com.binye.yomo.ui.theme.CornerRadius
+import com.binye.yomo.ui.theme.Elevation
+import com.binye.yomo.ui.theme.Spacing
 import com.binye.yomo.ui.theme.YomoColors
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -37,21 +39,21 @@ import java.util.Locale
 fun ReminderCard(
     reminder: Reminder,
     onClick: () -> Unit,
-    onComplete: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val shape = RoundedCornerShape(16.dp)
+    val shape = RoundedCornerShape(CornerRadius.large)
     val timeFormat = SimpleDateFormat("h:mm a", Locale.getDefault())
     val dateFormat = SimpleDateFormat("MMM d", Locale.getDefault())
 
     Box(
         modifier = modifier
             .fillMaxWidth()
+            .shadow(Elevation.card, shape)
             .clip(shape)
             .background(YomoColors.CardGlass)
-            .border(1.dp, YomoColors.CardGlassBorder, shape)
+            .border(0.5.dp, YomoColors.CardGlassBorder, shape)
             .clickable(onClick = onClick)
-            .padding(16.dp)
+            .padding(Spacing.md)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -85,7 +87,7 @@ fun ReminderCard(
 
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    horizontalArrangement = Arrangement.spacedBy(Spacing.sm)
                 ) {
                     Text(
                         text = if (reminder.isToday) {
@@ -95,7 +97,7 @@ fun ReminderCard(
                         },
                         style = MaterialTheme.typography.bodyMedium,
                         color = if (reminder.isOverdue) YomoColors.OverdueRed
-                        else YomoColors.TextMuted
+                        else YomoColors.TextTertiary
                     )
 
                     if (reminder.recurrence != null && reminder.recurrence.type != RecurrenceType.NONE) {
@@ -103,26 +105,10 @@ fun ReminderCard(
                             imageVector = Icons.Default.Repeat,
                             contentDescription = "Recurring",
                             modifier = Modifier.size(14.dp),
-                            tint = YomoColors.TextMuted
+                            tint = YomoColors.TextTertiary
                         )
                     }
                 }
-            }
-
-            // Complete button
-            IconButton(
-                onClick = onComplete,
-                modifier = Modifier
-                    .size(40.dp)
-                    .clip(CircleShape)
-                    .border(1.5.dp, YomoColors.CheckGold, CircleShape)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Check,
-                    contentDescription = "Complete",
-                    tint = YomoColors.CheckGold,
-                    modifier = Modifier.size(20.dp)
-                )
             }
         }
     }

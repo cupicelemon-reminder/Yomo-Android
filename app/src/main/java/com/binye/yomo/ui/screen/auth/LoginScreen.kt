@@ -1,25 +1,22 @@
 package com.binye.yomo.ui.screen.auth
 
-import android.app.Activity
-import androidx.compose.foundation.background
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Phone
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -29,15 +26,17 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.binye.yomo.R
 import com.binye.yomo.data.repository.AuthRepository
+import com.binye.yomo.ui.component.AuthButton
+import com.binye.yomo.ui.component.GradientBackground
+import com.binye.yomo.ui.theme.Spacing
 import com.binye.yomo.ui.theme.YomoColors
 import kotlinx.coroutines.launch
 
@@ -52,33 +51,34 @@ fun LoginScreen(
     var isLoading by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(
-                Brush.linearGradient(
-                    colors = listOf(YomoColors.BackgroundStart, YomoColors.BackgroundEnd),
-                    start = Offset(0f, 0f),
-                    end = Offset(0f, Float.POSITIVE_INFINITY)
-                )
-            )
-    ) {
+    val infiniteTransition = rememberInfiniteTransition(label = "float")
+    val floatOffset by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 12f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(2000),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "floatOffset"
+    )
+
+    GradientBackground {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 32.dp),
+                .padding(horizontal = Spacing.xl),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            // Logo area
-            Text(
-                text = "Yomo",
-                fontSize = 48.sp,
-                fontWeight = FontWeight.Bold,
-                color = YomoColors.BrandBlue
+            Image(
+                painter = painterResource(id = R.drawable.yomo_logo),
+                contentDescription = "Yomo",
+                modifier = Modifier
+                    .size(120.dp)
+                    .offset { IntOffset(0, floatOffset.toInt()) }
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(Spacing.sm))
 
             Text(
                 text = "Your moment. Don't miss it.",
@@ -89,8 +89,8 @@ fun LoginScreen(
 
             Spacer(modifier = Modifier.height(64.dp))
 
-            // Google Sign-In button
-            Button(
+            AuthButton(
+                text = "Continue with Google",
                 onClick = {
                     scope.launch {
                         isLoading = true
@@ -106,58 +106,20 @@ fun LoginScreen(
                     }
                 },
                 enabled = !isLoading,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
-                shape = RoundedCornerShape(16.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = YomoColors.BrandBlue
-                )
-            ) {
-                if (isLoading) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(24.dp),
-                        color = YomoColors.TextPrimary,
-                        strokeWidth = 2.dp
-                    )
-                } else {
-                    Text(
-                        text = "Continue with Google",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                }
-            }
+                isLoading = isLoading
+            )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(Spacing.md))
 
-            // Phone Sign-In button
-            OutlinedButton(
+            AuthButton(
+                text = "Continue with Phone",
                 onClick = onPhoneAuth,
                 enabled = !isLoading,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
-                shape = RoundedCornerShape(16.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Phone,
-                    contentDescription = null,
-                    modifier = Modifier.size(20.dp),
-                    tint = YomoColors.TextPrimary
-                )
-                Spacer(modifier = Modifier.size(8.dp))
-                Text(
-                    text = "Continue with Phone",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = YomoColors.TextPrimary
-                )
-            }
+                icon = Icons.Default.Phone
+            )
 
-            // Error message
             errorMessage?.let { msg ->
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(Spacing.md))
                 Text(
                     text = msg,
                     color = YomoColors.OverdueRed,
